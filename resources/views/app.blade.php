@@ -17,5 +17,23 @@
     </head>
     <body class="font-sans antialiased">
         @inertia
+
+        <!-- Pusher --->
+        <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script>
+            // Enable pusher logging - don't include this in production
+            Pusher.logToConsole = true;
+
+            let pusher = new Pusher('f3bad28da4da401e9a07', {
+                cluster: 'ap1'
+            });
+
+            let channel = pusher.subscribe('my-channel');
+            channel.bind('my-event', function(data) {
+                // console.log('notification', JSON.stringify(data));
+                alert(JSON.stringify(data));
+            });
+        </script>
     </body>
 </html>

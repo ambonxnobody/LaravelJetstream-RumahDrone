@@ -52,11 +52,11 @@ const logout = () => {
                                     Dashboard
                                 </NavLink>
 
-                                <NavLink :href="route('inventory')" :active="route().current('inventory')">
+                                <NavLink :href="route('inventory.index')" :active="route().current('inventory.index')">
                                     Inventory
                                 </NavLink>
 
-                                <NavLink :href="route('delivery')" :active="route().current('delivery')">
+                                <NavLink v-if="$page.props.auth.user.role === 'staff'" :href="route('delivery.index')" :active="route().current('delivery.index')">
                                     Delivery
                                 </NavLink>
 
@@ -64,7 +64,7 @@ const logout = () => {
                                     Stock Management
                                 </NavLink>
 
-                                <NavLink :href="route('reports')" :active="route().current('reports')">
+                                <NavLink v-if="$page.props.auth.user.role === 'admin'" :href="route('reports')" :active="route().current('reports')">
                                     Reports
                                 </NavLink>
                             </div>
@@ -114,7 +114,7 @@ const logout = () => {
                                                     <form @submit.prevent="switchToTeam(team)">
                                                         <DropdownLink as="button">
                                                             <div class="flex items-center">
-                                                                <svg v-if="team.id == $page.props.auth.user.current_team_id" class="me-2 h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                <svg v-if="team.id === $page.props.auth.user.current_team_id" class="me-2 h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                 </svg>
 
@@ -210,6 +210,22 @@ const logout = () => {
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
                         </ResponsiveNavLink>
+
+                        <ResponsiveNavLink :href="route('inventory.index')" :active="route().current('inventory.index')">
+                            Inventory
+                        </ResponsiveNavLink>
+
+                        <ResponsiveNavLink v-if="$page.props.auth.user.role === 'staff'" :href="route('delivery.index')" :active="route().current('delivery.index')">
+                            Delivery
+                        </ResponsiveNavLink>
+
+                        <ResponsiveNavLink :href="route('stock-management')" :active="route().current('stock-management')">
+                            Stock Management
+                        </ResponsiveNavLink>
+
+                        <ResponsiveNavLink v-if="$page.props.auth.user.role === 'admin'" :href="route('reports')" :active="route().current('reports')">
+                            Reports
+                        </ResponsiveNavLink>
                     </div>
 
                     <!-- Responsive Settings Options -->
@@ -274,7 +290,7 @@ const logout = () => {
                                         <form @submit.prevent="switchToTeam(team)">
                                             <ResponsiveNavLink as="button">
                                                 <div class="flex items-center">
-                                                    <svg v-if="team.id == $page.props.auth.user.current_team_id" class="me-2 h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                    <svg v-if="team.id === $page.props.auth.user.current_team_id" class="me-2 h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
                                                     <div>{{ team.name }}</div>
