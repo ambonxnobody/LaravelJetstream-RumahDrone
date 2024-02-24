@@ -21,7 +21,7 @@ class DeliveryController extends Controller
     {
         return Inertia::render('Delivery', [
             'data' => Delivery::with('inventories')->orderBy('id', 'desc')->get(),
-            'inventory' => Inventory::orderBy('id', 'desc')->get(),
+            'inventory' => Inventory::orderBy('id', 'desc')->where('stock', '>', 0)->get(),
         ]);
     }
 
@@ -30,6 +30,16 @@ class DeliveryController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        foreach ($request->inventory as $key => $value) {
+            $inventory = Inventory::first('id', $value['inventory_id'])->get()[0];
+
+            if ($value['quantity'] > $inventory->stock && $request->status === 'delivered') {
+                $request->session()->flash('flash.banner', 'The stock of ' . $inventory->name . ' is not enough!');
+                $request->session()->flash('flash.bannerStyle', 'danger');
+                return redirect()->route('delivery.index');
+            }
+        }
+
         Validator::make($request->all(), [
             'date' => ['required', 'date'],
             'status' => ['required', Rule::in(['pending', 'delivered'])],
@@ -44,10 +54,10 @@ class DeliveryController extends Controller
 
         $delivery->inventories()->attach($request->inventory);
 
-        if ($request->status === 'delivered') {
-            foreach ($request->inventory as $key => $value) {
-                $inventory = Inventory::first('id', $value['inventory_id'])->get()[0];
+        foreach ($request->inventory as $key => $value) {
+            $inventory = Inventory::first('id', $value['inventory_id'])->get()[0];
 
+            if ($request->status === 'delivered') {
                 if ($request->type === 'inbound') {
                     $inventory->forceFill([
                         'stock_in' => $inventory->stock_in + $value['quantity'],
@@ -59,10 +69,10 @@ class DeliveryController extends Controller
                         'stock' => $inventory->stock - $value['quantity'],
                     ])->save();
                 }
+            }
 
-                if ($inventory->stock <= $inventory->minimum_stock) {
-                    event(new LowStockNotification('The stock of ' . $inventory->name . ' is low!'));
-                }
+            if ($inventory->stock <= $inventory->minimum_stock) {
+                event(new LowStockNotification('The stock of ' . $inventory->name . ' is low!'));
             }
         }
 
@@ -76,6 +86,16 @@ class DeliveryController extends Controller
      */
     public function update(Request $request, Delivery $delivery): RedirectResponse
     {
+        foreach ($request->inventory as $key => $value) {
+            $inventory = Inventory::first('id', $value['inventory_id'])->get()[0];
+
+            if ($value['quantity'] > $inventory->stock && $request->status === 'delivered') {
+                $request->session()->flash('flash.banner', 'The stock of ' . $inventory->name . ' is not enough!');
+                $request->session()->flash('flash.bannerStyle', 'danger');
+                return redirect()->route('delivery.index');
+            }
+        }
+
         if ($request->status === 'delivered') {
             $request->session()->flash('flash.banner', 'You cannot update delivery with delivered status!');
             $request->session()->flash('flash.bannerStyle', 'danger');
@@ -94,10 +114,10 @@ class DeliveryController extends Controller
 
         $delivery->inventories()->sync($request->inventory);
 
-        if ($request->status === 'delivered') {
-            foreach ($request->inventory as $key => $value) {
-                $inventory = Inventory::first('id', $value['inventory_id'])->get()[0];
+        foreach ($request->inventory as $key => $value) {
+            $inventory = Inventory::first('id', $value['inventory_id'])->get()[0];
 
+            if ($request->status === 'delivered') {
                 if ($request->type === 'inbound') {
                     $inventory->forceFill([
                         'stock_in' => $inventory->stock_in + $value['quantity'],
@@ -109,10 +129,10 @@ class DeliveryController extends Controller
                         'stock' => $inventory->stock - $value['quantity'],
                     ])->save();
                 }
+            }
 
-                if ($inventory->stock <= $inventory->minimum_stock) {
-                    event(new LowStockNotification('The stock of ' . $inventory->name . ' is low!'));
-                }
+            if ($inventory->stock <= $inventory->minimum_stock) {
+                event(new LowStockNotification('The stock of ' . $inventory->name . ' is low!'));
             }
         }
 

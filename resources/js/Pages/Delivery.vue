@@ -23,6 +23,7 @@
 
     const showModal = ref('');
     const showDeleteModal = ref(false);
+    const showDeliveredModal = ref(false);
 
     const deliveryId = ref(null);
 
@@ -35,6 +36,7 @@
     });
 
     const columns = [
+        { label: 'Order Number', key: 'order_number', className: 'text-center', sortable: true },
         { label: 'Date', key: 'date', className: 'text-center', sortable: true, format: (value) => formatDateToIndonesian(value) },
         { label: 'Status', key: 'status', className: 'text-center', type: 'status', success: 'delivered', warning: 'pending', sortable: true },
         { label: 'Type', key: 'type', className: 'text-center', type: 'status', success: 'inbound', danger: 'outbound', sortable: true },
@@ -42,6 +44,11 @@
     ];
 
     const actions = [
+        {
+            label: 'Mark as Delivered',
+            show: (item) => item.status === 'pending',
+            behaviour: (id) => openDeliveredModal(id),
+        },
         {
             label: 'Edit',
             show: (item) => item.status === 'pending',
@@ -128,7 +135,7 @@
         deliveryId.value = null;
     };
 
-    const deletedelivery = () => {
+    const deleteDelivery = () => {
         deleteDeliveryForm.delete(route('delivery.destroy', deliveryId.value), {
             preserveScroll: true,
             preserveState: true,
@@ -147,6 +154,45 @@
 
     const incrementQuantity = (index) => {
         form.inventory[index].quantity++;
+    };
+
+    const deliveredForm = useForm({
+        date: '',
+        status: '',
+        type: '',
+        notes: '',
+        inventory: []
+    });
+
+    const openDeliveredModal = (id) => {
+        showDeliveredModal.value = true;
+
+        props.data.forEach((item) => {
+            if (item.id === id) {
+                deliveredForm.date = item.date;
+                deliveredForm.status = item.status;
+                deliveredForm.type = item.type;
+                deliveredForm.notes = item.notes;
+                deliveredForm.inventory = item.inventory;
+            }
+        });
+    };
+
+    const closeDeliveredModal = () => {
+        showDeliveredModal.value = false;
+        deliveryId.value = null;
+    };
+
+    const submitDelivered = () => {
+        deliveredForm.put(route('delivery.update', deliveredForm.id), {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                deliveryId.value = null
+                deliveredForm.reset();
+                showDeliveredModal.value = false;
+            },
+        });
     };
 </script>
 
@@ -329,10 +375,35 @@
                     class="ms-3"
                     :class="{ 'opacity-25': deleteDeliveryForm.processing }"
                     :disabled="deleteDeliveryForm.processing"
-                    @click="deletedelivery"
+                    @click="deleteDelivery"
                 >
                     Delete
                 </DangerButton>
+            </template>
+        </ConfirmationModal>
+
+        <ConfirmationModal :show="showDeliveredModal" @close="!showDeliveredModal">
+            <template #title>
+                Mark as Delivered
+            </template>
+
+            <template #content>
+                Are you sure you would like to mark this delivery as delivered?
+            </template>
+
+            <template #footer>
+                <SecondaryButton @click="closeDeliveredModal">
+                    Cancel
+                </SecondaryButton>
+
+                <PrimaryButton
+                    class="ms-3"
+                    :class="{ 'opacity-25': deliveredForm.processing }"
+                    :disabled="deliveredForm.processing"
+                    @click="submitDelivered"
+                >
+                    Mark as Delivered
+                </PrimaryButton>
             </template>
         </ConfirmationModal>
     </AppLayout>

@@ -60,12 +60,8 @@ const logout = () => {
                                     Delivery
                                 </NavLink>
 
-                                <NavLink :href="route('stock-management')" :active="route().current('stock-management')">
-                                    Stock Management
-                                </NavLink>
-
-                                <NavLink v-if="$page.props.auth.user.role === 'admin'" :href="route('reports')" :active="route().current('reports')">
-                                    Reports
+                                <NavLink v-if="$page.props.auth.user.role === 'admin'" :href="route('report.index')" :active="route().current('report.index')">
+                                    Report
                                 </NavLink>
                             </div>
                         </div>
@@ -219,12 +215,8 @@ const logout = () => {
                             Delivery
                         </ResponsiveNavLink>
 
-                        <ResponsiveNavLink :href="route('stock-management')" :active="route().current('stock-management')">
-                            Stock Management
-                        </ResponsiveNavLink>
-
-                        <ResponsiveNavLink v-if="$page.props.auth.user.role === 'admin'" :href="route('reports')" :active="route().current('reports')">
-                            Reports
+                        <ResponsiveNavLink v-if="$page.props.auth.user.role === 'admin'" :href="route('report.index')" :active="route().current('report.index')">
+                            Report
                         </ResponsiveNavLink>
                     </div>
 

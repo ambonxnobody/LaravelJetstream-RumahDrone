@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ReportController;
 use App\Models\Inventory;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -45,14 +47,9 @@ Route::middleware([
     Route::delete('/inventory/image/{inventory}', [InventoryController::class, 'removeImage'])->name('inventory.removeImage')->middleware('admin');
     // end::Inventory Routes
 
-    Route::get('/stock-management', function () {
-        return Inertia::render('StockManagement');
-    })->name('stock-management');
-
     // begin::Admin Routes
-    Route::get('/reports', function () {
-        return Inertia::render('Reports');
-    })->name('reports')->middleware('admin');
+    Route::get('/report', [ReportController::class, 'index'])->name('report.index')->middleware('admin');
+    Route::get('/invoice/{invoice}', [InvoiceController::class, 'show'])->name('invoice.show')->middleware('admin');
     // end::Admin Routes
 
     // begin::Staff Routes
