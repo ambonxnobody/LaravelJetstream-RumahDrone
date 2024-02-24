@@ -35,3 +35,12 @@ npm run dev # or you can use npm run build
 php artisan serve
 ```
 10. Open the browser and go to the localhost:8000
+
+## Users
+- Admin
+  - email: admin@email.com
+  - password: password
+
+- Staff
+  - email: staff@email.com
+  - password: password
